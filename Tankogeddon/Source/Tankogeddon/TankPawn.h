@@ -21,6 +21,8 @@ public:
 
 	UFUNCTION()
 		void MoveForward(float AxisValue);
+	UFUNCTION()
+		void MoveLeft(float AxisValue);
 
 
 protected:
@@ -43,7 +45,7 @@ protected:
 		float RotationSpeed = 100;
 
 	float TargetForwardAxisValue;
-
+	float TargetLeftAxisValue;
 
 public:	
 	// Called every frame
