@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "TimerManager.h"
 #include "Engine/Engine.h"
+#include <string>
+#include <sstream>
 
 
 // Sets default values
@@ -25,8 +27,22 @@ ACannon::ACannon()
 
 }
 
+float ACannon::GetAmmo()
+{
+	return Ammo;
+}
+
 void ACannon::Fire()
 {
+	//std::string str = "Fire - projectile, ammount of ammo is: ";
+	//char* str2;
+	//std::stringstream iostr;
+	//iostr << Ammo;
+	//iostr >> str2;
+	//std::string stri = str + str2;
+
+	
+
 	if (!ReadyToFire)
 	{
 		return;
@@ -41,6 +57,35 @@ void ACannon::Fire()
 	{
 		GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
 	}
+	Ammo--;
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
+}
+
+void ACannon::FireSpecial()
+{
+	if (Ammo / 3 >= 1)
+	{
+		if (!ReadyToFire)
+		{
+			return;
+		}
+		ReadyToFire = false;
+		FireDamage += 2;
+
+		if (Type == ECannonType::FireProjectile)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - projectile");
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - projectile");
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - projectile");
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
+		}
+	}
+	Ammo -= 3;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
 }
 
@@ -51,7 +96,15 @@ bool ACannon::IsReadyToFire()
 
 void ACannon::Reload()
 {
-	ReadyToFire = true;
+	if (Ammo > 0)
+	{
+		ReadyToFire = true;
+	}
+	else
+	{
+		ReadyToFire = false;
+	}
+	
 }
 
 // Called when the game starts or when spawned
@@ -61,10 +114,8 @@ void ACannon::BeginPlay()
 	Reload();
 }
 
-// Called every frame
-void ACannon::Tick(float DeltaTime)
+
+void ACannon::Tick(float Value) 
 {
-	Super::Tick(DeltaTime);
 
 }
-

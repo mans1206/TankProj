@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Cannon.generated.h"
 
+
 class UArrowComponent;
 
 UCLASS()
@@ -21,10 +22,14 @@ protected:
 		UArrowComponent* ProjectileSpawnPoint;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
+		float Ammo = 15;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
 		float FireRate = 1;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
 		float FireRange = 1000;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
 		float FireDamage = 1;
 
@@ -44,6 +49,9 @@ public:
 
 	bool IsReadyToFire();
 
+	void FireSpecial();
+
+	float GetAmmo();
 
 protected:
 	// Called when the game starts or when spawned

@@ -19,6 +19,7 @@ protected:
 	UPROPERTY()
 		FVector MousePos;
 	void Fire();
+	void FireSpecial();
 
 public:
 	ATankPlayerController();
