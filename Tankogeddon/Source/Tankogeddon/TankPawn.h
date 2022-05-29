@@ -34,10 +34,13 @@ public:
 	UFUNCTION()
 		void FireSpecial();
 
+	void SetupCannon(TSubclassOf<ACannon> cannonClass);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void SetupCannon();
+
+	
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UStaticMeshComponent* BodyMesh;

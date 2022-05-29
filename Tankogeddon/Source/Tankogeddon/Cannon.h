@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameStructs.h"
 #include "GameFramework/Actor.h"
+#include <Tankogeddon/Projectile.h>
 #include "Cannon.generated.h"
-
 
 class UArrowComponent;
 
@@ -35,6 +35,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
 		ECannonType Type = ECannonType::FireProjectile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Fire params")
+		TSubclassOf<AProjectile> ProjectileClass;
 
 	FTimerHandle ReloadTimerHandle;
 
