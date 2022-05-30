@@ -9,6 +9,7 @@
 #include <string>
 #include <sstream>
 #include <Runtime/Engine/Public/DrawDebugHelpers.h>
+#include <Tankogeddon/ReallyAmmoBox.h>
 
 
 // Sets default values
@@ -28,22 +29,14 @@ ACannon::ACannon()
 
 }
 
-float ACannon::GetAmmo()
+void ACannon::SetAmmo()
 {
-	return Ammo;
+	AReallyAmmoBox* ambox = nullptr;
+	Ammo = ambox->GetAmmo();
 }
 
 void ACannon::Fire()
 {
-	//std::string str = "Fire - projectile, ammount of ammo is: ";
-	//char* str2;
-	//std::stringstream iostr;
-	//iostr << Ammo;
-	//iostr >> str2;
-	//std::string stri = str + str2;
-
-	
-
 	if (!ReadyToFire)
 	{
 		return;
@@ -88,6 +81,20 @@ void ACannon::Fire()
 	}
 	Ammo--;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
+}
+
+void ACannon::ChangeCannon()
+{
+	ECannonType tmp;
+	tmp = Type;
+	if (Type == ECannonType::FireProjectile)
+	{
+		Type = ECannonType::FireTrace;
+	}
+	else if (Type == ECannonType::FireTrace)
+	{
+		Type = ECannonType::FireProjectile;
+	}
 }
 
 void ACannon::FireSpecial()

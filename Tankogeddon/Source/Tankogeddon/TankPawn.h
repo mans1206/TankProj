@@ -33,8 +33,11 @@ public:
 		void Fire();
 	UFUNCTION()
 		void FireSpecial();
+	UFUNCTION()
+		void ChangeCannon();
 
 	void SetupCannon(TSubclassOf<ACannon> cannonClass);
+	void SetAmmo();
 
 protected:
 	// Called when the game starts or when spawned

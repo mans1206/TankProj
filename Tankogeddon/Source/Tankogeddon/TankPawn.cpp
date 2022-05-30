@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ArrowComponent.h"
 
+
 //DECLARE_LOG_CATEGORY_EXTERN(TankLog, All, All);
 //DEFINE_LOG_CATEGORY(TankLog);
 
@@ -65,6 +66,7 @@ void ATankPawn::BeginPlay()
 	SetupCannon(CannonClass);
 }
 
+//ACannon* tmp;
 void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
 {
 	if (cannonClass)
@@ -73,15 +75,40 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
 	}
 	if (Cannon)
 	{
+		//tmp = Cannon;
 		Cannon->Destroy();
 	}
-
 	FActorSpawnParameters params;
 	params.Instigator = this;
 	params.Owner = this;
 	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
 	Cannon->AttachToComponent(CanonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+}
+
+//void ATankPawn::ChangeCannon()
+//{
+//	if (!Cannon)
+//	{
+//		Cannon = tmp;
+//	}
+//	else if (Cannon)
+//	{
+//		Cannon->Destroy();
+//	}
+//	FActorSpawnParameters params;
+//	params.Instigator = this;
+//	params.Owner = this;
+//	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
+//	Cannon->AttachToComponent(CanonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+//}
+
+void ATankPawn::ChangeCannon()
+{
+	if (Cannon)
+	{
+		Cannon->ChangeCannon();
+	}
 }
 
 
@@ -93,6 +120,14 @@ void ATankPawn::Fire()
 	}
 }
 
+void ATankPawn::SetAmmo()
+{
+	if (Cannon)
+	{
+		Cannon->SetAmmo();
+	}
+}
+
 void ATankPawn::FireSpecial()
 {
 	if (Cannon)
@@ -100,6 +135,8 @@ void ATankPawn::FireSpecial()
 		Cannon->FireSpecial();
 	}
 }
+
+
 // Called every frame
 void ATankPawn::Tick(float DeltaTime)
 {

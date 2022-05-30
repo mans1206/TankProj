@@ -54,7 +54,9 @@ public:
 
 	void FireSpecial();
 
-	float GetAmmo();
+	void SetAmmo();
+
+	void ChangeCannon();
 
 protected:
 	// Called when the game starts or when spawned

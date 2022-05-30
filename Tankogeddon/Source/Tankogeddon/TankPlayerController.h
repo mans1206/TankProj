@@ -20,6 +20,7 @@ protected:
 		FVector MousePos;
 	void Fire();
 	void FireSpecial();
+	void ChangeCannon();
 
 public:
 	ATankPlayerController();
@@ -31,6 +32,5 @@ protected:
 	virtual void BeginPlay() override;
 	void MoveForward(float AxisValue);
 	void MoveLeft(float AxisValue);
-	void RotateRight(float AxisValue);
-
+	void RotateRight(float AxisValue);	
 };
