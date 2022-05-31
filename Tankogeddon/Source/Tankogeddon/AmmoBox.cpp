@@ -27,10 +27,11 @@ AAmmoBox::AAmmoBox()
 void AAmmoBox::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ATankPawn* playerPawn =	Cast<ATankPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
-	if (OtherActor == playerPawn)
+	//ATankPawn* playerPawn =	Cast<ATankPawn>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	ATankPawn* Tank = Cast <ATankPawn>(OtherActor);
+	if (Tank)
 	{
-		playerPawn->SetupCannon(CannonClass);
+		Tank->SetupCannon(CannonClass);
 		Destroy();
 	}
 }

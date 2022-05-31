@@ -56,7 +56,7 @@ public:
 
 	void SetAmmo();
 
-	void ChangeCannon();
+//	void ChangeCannon();
 
 protected:
 	// Called when the game starts or when spawned

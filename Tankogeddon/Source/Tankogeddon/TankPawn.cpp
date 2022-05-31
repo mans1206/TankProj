@@ -66,16 +66,17 @@ void ATankPawn::BeginPlay()
 	SetupCannon(CannonClass);
 }
 
-//ACannon* tmp;
+TSubclassOf<ACannon> OldcanClass;
 void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
 {
 	if (cannonClass)
 	{
+		OldcanClass = CannonClass;
 		CannonClass = cannonClass;
 	}
 	if (Cannon)
 	{
-		//tmp = Cannon;
+		
 		Cannon->Destroy();
 	}
 	FActorSpawnParameters params;
@@ -86,30 +87,14 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
 
 }
 
-//void ATankPawn::ChangeCannon()
-//{
-//	if (!Cannon)
-//	{
-//		Cannon = tmp;
-//	}
-//	else if (Cannon)
-//	{
-//		Cannon->Destroy();
-//	}
-//	FActorSpawnParameters params;
-//	params.Instigator = this;
-//	params.Owner = this;
-//	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
-//	Cannon->AttachToComponent(CanonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-//}
-
 void ATankPawn::ChangeCannon()
 {
 	if (Cannon)
 	{
-		Cannon->ChangeCannon();
+		SetupCannon(OldcanClass);
 	}
 }
+
 
 
 void ATankPawn::Fire()

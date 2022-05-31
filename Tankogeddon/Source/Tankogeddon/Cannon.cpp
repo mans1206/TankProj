@@ -10,6 +10,7 @@
 #include <sstream>
 #include <Runtime/Engine/Public/DrawDebugHelpers.h>
 #include <Tankogeddon/ReallyAmmoBox.h>
+#include <Tankogeddon/TankPawn.h>
 
 
 // Sets default values
@@ -31,8 +32,8 @@ ACannon::ACannon()
 
 void ACannon::SetAmmo()
 {
-	AReallyAmmoBox* ambox = nullptr;
-	Ammo = ambox->GetAmmo();
+	
+	Ammo = 15;
 }
 
 void ACannon::Fire()
@@ -83,19 +84,19 @@ void ACannon::Fire()
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
 }
 
-void ACannon::ChangeCannon()
-{
-	ECannonType tmp;
-	tmp = Type;
-	if (Type == ECannonType::FireProjectile)
-	{
-		Type = ECannonType::FireTrace;
-	}
-	else if (Type == ECannonType::FireTrace)
-	{
-		Type = ECannonType::FireProjectile;
-	}
-}
+//void ACannon::ChangeCannon()
+//{
+//	TSubclassOf<ACannon> oldcan = Cannon;
+//	tmp = Type;
+//	if (Type == ECannonType::FireProjectile)
+//	{
+//		Type = ECannonType::FireTrace;
+//	}
+//	else if (Type == ECannonType::FireTrace)
+//	{
+//		Type = ECannonType::FireProjectile;
+//	}
+//}
 
 void ACannon::FireSpecial()
 {
