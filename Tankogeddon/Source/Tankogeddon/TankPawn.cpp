@@ -10,8 +10,8 @@
 #include "Components/ArrowComponent.h"
 
 
-//DECLARE_LOG_CATEGORY_EXTERN(TankLog, All, All);
-//DEFINE_LOG_CATEGORY(TankLog);
+/*DECLARE_LOG_CATEGORY_EXTERN(TankLog, All, All);
+DEFINE_LOG_CATEGORY(TankLog);*/
 
 
 // Sets default values
@@ -40,6 +40,28 @@ ATankPawn::ATankPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health component"));
+	HealthComponent->OnDie.AddUObject(this, &ATankPawn::Die);
+	HealthComponent->OnDamaged.AddUObject(this, &ATankPawn::DamageTaked);
+
+	HitCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Hit collider"));
+	HitCollider->SetupAttachment(BodyMesh);
+
+}
+
+void ATankPawn::TakeDamage(FDamageData DamageData)
+{
+	HealthComponent->TakeDamage(DamageData);
+}
+
+void ATankPawn::Die()
+{
+	Destroy();
+}
+
+void ATankPawn::DamageTaked(float DamageValue)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Tank %s taked damage:%f Health:%f"), *GetName(),DamageValue, HealthComponent->GetHealth());
 }
 
 void ATankPawn::MoveForward(float AxisValue)
@@ -94,8 +116,6 @@ void ATankPawn::ChangeCannon()
 		SetupCannon(OldcanClass);
 	}
 }
-
-
 
 void ATankPawn::Fire()
 {

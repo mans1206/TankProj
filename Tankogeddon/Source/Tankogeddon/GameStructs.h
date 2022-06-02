@@ -17,3 +17,16 @@ enum class ECannonType : uint8
 	FireCapsule = 3 UMETA(DisplayName = "Use capsule")
 
 };
+
+USTRUCT()
+struct FDamageData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+		float DamageValue;
+	UPROPERTY()
+		AActor* Instigator;
+	UPROPERTY()
+		AActor* DamageMaker;
+};
