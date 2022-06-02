@@ -41,12 +41,14 @@ void AProjectile::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 			damageData.DamageValue = Damage;
 			damageData.Instigator = owner;
 			damageData.DamageMaker = this;
+
 			damageTakerActor->TakeDamage(damageData);
 		}
 		else
 		{
 			OtherActor->Destroy();
 		}
+
 		Destroy();
 	}
 

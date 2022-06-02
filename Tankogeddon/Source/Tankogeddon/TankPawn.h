@@ -2,6 +2,7 @@
 
 #pragma once
 
+//#include "TestParClass.h"
 #include "Cannon.h"
 #include "CoreMinimal.h"
 #include "DamageTaker.h"
@@ -18,7 +19,7 @@ class ACannon;
 
 
 UCLASS()
-class TANKOGEDDON_API ATankPawn : public APawn, public IDamageTaker
+class TANKOGEDDON_API ATankPawn : public APawn, public IDamageTaker//, public TestParClass
 {
 	GENERATED_BODY()
 

@@ -6,10 +6,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "TimerManager.h"
 #include "Engine/Engine.h"
-#include <string>
-#include <sstream>
 #include <Runtime/Engine/Public/DrawDebugHelpers.h>
 #include <Tankogeddon/ReallyAmmoBox.h>
+#include <Tankogeddon/DamageTaker.h>
 #include <Tankogeddon/TankPawn.h>
 
 
@@ -66,13 +65,33 @@ void ACannon::Fire()
 		FVector start = ProjectileSpawnPoint->GetComponentLocation();
 		FVector end = ProjectileSpawnPoint->GetForwardVector() * FireRange + start;
 
-		if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end,ECollisionChannel::ECC_Visibility, traceParams))
+		if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end,ECollisionChannel::ECC_WorldStatic, traceParams))
 		{
 			DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false,
 				0.5f, 0, 5);
 			if (hitResult.Actor.Get())
 			{
-				hitResult.Actor.Get()->Destroy();
+				UE_LOG(LogTemp, Warning, TEXT("Lazer collided with %s. "), *hitResult.Actor.Get()->GetName());
+				AActor* owner = GetOwner();
+				AActor* ownerByOwner = owner != nullptr ? owner->GetOwner() : nullptr;
+				if (hitResult.Actor.Get() != owner && hitResult.Actor.Get() != ownerByOwner)
+				{
+					IDamageTaker* damageTakerActor = Cast<IDamageTaker>(hitResult.Actor.Get());
+					if (damageTakerActor)
+					{
+						FDamageData damageData;
+						damageData.DamageValue = 1;
+						damageData.Instigator = owner;
+						damageData.DamageMaker = this;
+
+						damageTakerActor->TakeDamage(damageData);
+					}
+					else
+					{
+						hitResult.Actor.Get()->Destroy();
+					}
+				}
+				
 			}
 		}
 		else
@@ -80,23 +99,9 @@ void ACannon::Fire()
 			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.5f, 0, 5);
 		}
 	}
-	Ammo--;
+	
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
 }
-
-//void ACannon::ChangeCannon()
-//{
-//	TSubclassOf<ACannon> oldcan = Cannon;
-//	tmp = Type;
-//	if (Type == ECannonType::FireProjectile)
-//	{
-//		Type = ECannonType::FireTrace;
-//	}
-//	else if (Type == ECannonType::FireTrace)
-//	{
-//		Type = ECannonType::FireProjectile;
-//	}
-//}
 
 void ACannon::FireSpecial()
 {

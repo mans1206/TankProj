@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Turret.h"
+#include "Turret2.h"
 #include "TankPlayerController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Cannon.h"
@@ -11,27 +11,28 @@
 #include "Components/BoxComponent.h"
 
 // Sets default values
-ATurret::ATurret()
+ATurret2::ATurret2()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret body"));
 	RootComponent = BodyMesh;
 
 	TurretMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret"));
-	TurretMesh->AttachToComponent(BodyMesh,FAttachmentTransformRules::KeepRelativeTransform);
+	TurretMesh->AttachToComponent(BodyMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
 	CannonSetupPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Cannon setup point"));
-	CannonSetupPoint->AttachToComponent(TurretMesh,FAttachmentTransformRules::KeepRelativeTransform);
+	CannonSetupPoint->AttachToComponent(TurretMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
 	HitCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Hit collider"));
-	HitCollider->SetupAttachment(TurretMesh);
+	HitCollider->SetupAttachment(BodyMesh);
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health component"));
-	HealthComponent->OnDie.AddUObject(this, &ATurret::Die);
-	HealthComponent->OnDamaged.AddUObject(this, &ATurret::DamageTaked);
+	HealthComponent->OnDie.AddUObject(this, &ATurret2::Die);
+	HealthComponent->OnDamaged.AddUObject(this, &ATurret2::DamageTaked);
 
-	UStaticMesh * turretMeshTemp = LoadObject<UStaticMesh>(this, *TurretMeshPath);
+
+	UStaticMesh* turretMeshTemp = LoadObject<UStaticMesh>(this, *TurretMeshPath);
 	if (turretMeshTemp)
 		TurretMesh->SetStaticMesh(turretMeshTemp);
 
@@ -39,22 +40,22 @@ ATurret::ATurret()
 	if (bodyMeshTemp)
 		BodyMesh->SetStaticMesh(bodyMeshTemp);
 
-	
+
 
 }
 
 // Called when the game starts or when spawned
-void ATurret::BeginPlay()
+void ATurret2::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupCannon();
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 	FTimerHandle _targetingTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(_targetingTimerHandle, this,
-		&ATurret::Targeting, TargetingRate, true, TargetingRate);
+		&ATurret2::Targeting, TargetingRate, true, TargetingRate);
 }
 
-void ATurret::SetupCannon()
+void ATurret2::SetupCannon()
 {
 	if (!CannonClass)
 	{
@@ -65,15 +66,17 @@ void ATurret::SetupCannon()
 	params.Owner = this;
 	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
 	Cannon->AttachToComponent(CannonSetupPoint, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	
+
 }
 
-void ATurret::Destroyed()
+void ATurret2::Destroyed()
 {
 	if (Cannon)
+	{
 		Cannon->Destroy();
+	}
 }
-void ATurret::Targeting()
+void ATurret2::Targeting()
 {
 	if (IsPlayerInRange())
 	{
@@ -85,21 +88,21 @@ void ATurret::Targeting()
 	}
 }
 
-void ATurret::RotateToPlayer()
+void ATurret2::RotateToPlayer()
 {
-	FRotator targetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(),PlayerPawn->GetActorLocation());
+	FRotator targetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerPawn->GetActorLocation());
 	FRotator currRotation = TurretMesh->GetComponentRotation();
 	targetRotation.Pitch = currRotation.Pitch;
 	targetRotation.Roll = currRotation.Roll;
-	TurretMesh->SetWorldRotation(FMath::Lerp(currRotation, targetRotation,TargetingSpeed));
+	TurretMesh->SetWorldRotation(FMath::Lerp(currRotation, targetRotation, TargetingSpeed));
 }
 
-bool ATurret::IsPlayerInRange()
+bool ATurret2::IsPlayerInRange()
 {
 	return FVector::Distance(PlayerPawn->GetActorLocation(), GetActorLocation()) <= TargetingRange;
 }
 
-bool ATurret::CanFire()
+bool ATurret2::CanFire()
 {
 	FVector targetingDir = TurretMesh->GetForwardVector();
 	FVector dirToPlayer = PlayerPawn->GetActorLocation() - GetActorLocation();
@@ -108,24 +111,25 @@ bool ATurret::CanFire()
 	return aimAngle <= Accuracy;
 }
 
-void ATurret::Fire()
+void ATurret2::Fire()
 {
-	if (Cannon)
+	if (IsPlayerInRange())
+	{
 		Cannon->Fire();
+	}
 }
 
-void ATurret::TakeDamage(FDamageData DamageData)
+void ATurret2::TakeDamage(FDamageData DamageData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Turret %s taked damage:%f "), *GetName(),DamageData.DamageValue);
 	HealthComponent->TakeDamage(DamageData);
 }
 
-void ATurret::Die()
+void ATurret2::Die()
 {
 	Destroy();
 }
 
-void ATurret::DamageTaked(float DamageValue)
+void ATurret2::DamageTaked(float DamageValue)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Turret %s taked damage:%f Health:%f"), *GetName(), DamageValue, HealthComponent->GetHealth());
 }

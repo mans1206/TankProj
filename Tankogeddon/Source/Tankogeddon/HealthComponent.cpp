@@ -20,12 +20,16 @@ void UHealthComponent::TakeDamage(FDamageData DamageData)
 	if (CurrentHealth <= 0)
 	{
 		if (OnDie.IsBound())
+		{
 			OnDie.Broadcast();
+		}
 	}
 	else
 	{
 		if (OnDamaged.IsBound())
+		{
 			OnDamaged.Broadcast(takedDamageValue);
+		}
 	}
 }
 

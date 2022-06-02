@@ -25,8 +25,10 @@ struct FDamageData
 
 	UPROPERTY()
 		float DamageValue;
+
 	UPROPERTY()
 		AActor* Instigator;
+
 	UPROPERTY()
 		AActor* DamageMaker;
 };

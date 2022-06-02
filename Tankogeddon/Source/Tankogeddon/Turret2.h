@@ -2,6 +2,7 @@
 
 #pragma once
 
+//#include "TestParClass.h"
 #include "CoreMinimal.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
@@ -9,16 +10,17 @@
 #include "Cannon.h"
 #include "DamageTaker.h"
 #include "HealthComponent.h"
-#include "Turret.generated.h"
+#include "Turret2.generated.h"
 
 UCLASS()
-class TANKOGEDDON_API ATurret : public AActor
+class TANKOGEDDON_API ATurret2 : public AActor, public IDamageTaker//, public TestParClass
+
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
-	ATurret();
+	ATurret2();
 
 	UFUNCTION()
 		void TakeDamage(FDamageData DamageData);
@@ -28,6 +30,8 @@ public:
 
 	UFUNCTION()
 		void DamageTaked(float DamageValue);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -76,8 +80,9 @@ protected:
 	const FString TurretMeshPath = "StaticMesh'/Game/CSC/Meshes/SM_CSC_Gun1.SM_CSC_Gun1'";
 
 
-	
 
-public:	
-	
+
+public:
+
 };
+
