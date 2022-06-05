@@ -6,6 +6,10 @@
 #include "GameStructs.h"
 #include "GameFramework/Actor.h"
 #include <Tankogeddon/Projectile.h>
+#include "Projectile.h"
+#include "Components/AudioComponent.h"
+#include "GameFramework/ForceFeedbackEffect.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Cannon.generated.h"
 
 class UArrowComponent;
@@ -42,6 +46,14 @@ protected:
 	FTimerHandle ReloadTimerHandle;
 
 	bool ReadyToFire = false;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UParticleSystemComponent* ShootEffect;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UAudioComponent* AudioEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects")
+		UForceFeedbackEffect* ShootForceEffect;
 
 
 public:	

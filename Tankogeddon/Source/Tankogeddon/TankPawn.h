@@ -9,6 +9,9 @@
 #include "HealthComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Pawn.h"
+#include "Components/AudioComponent.h"
+#include "GameFramework/ForceFeedbackEffect.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "TankPawn.generated.h"
 
 class UStaticMeshComponent;
@@ -45,6 +48,20 @@ public:
 
 	void SetupCannon(TSubclassOf<ACannon> cannonClass);
 	void SetAmmo();
+
+	UFUNCTION()
+		float GetMovementAccuracy() { return MovementAccuracy; };
+	UFUNCTION()
+		TArray <FVector> GetPatrollingPoints() { return PatrollingPoints; };
+
+	UFUNCTION()
+		FVector GetTurretForwardVector();
+
+	UFUNCTION()
+		void RotateTurretTo(FVector TargetPosition);
+
+	FVector GetEyesPosition();
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -93,10 +110,23 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UBoxComponent* HitCollider;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UParticleSystemComponent* DieEffect;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Audio Components")
+		UAudioComponent* AudioDieEffect;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Audio Components")
+		UAudioComponent* AudioHitEffect;
+
 	UFUNCTION()
 		void Die();
 	UFUNCTION()
 		void DamageTaked(float DamageValue);
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Patrol points", Meta = (MakeEditWidget = true))
+		TArray<FVector> PatrollingPoints;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Accuracy")
+		float MovementAccuracy = 50;
 
 public:	
 	// Called every frame

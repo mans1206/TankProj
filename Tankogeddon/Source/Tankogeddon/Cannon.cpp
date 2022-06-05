@@ -10,6 +10,8 @@
 #include <Tankogeddon/ReallyAmmoBox.h>
 #include <Tankogeddon/DamageTaker.h>
 #include <Tankogeddon/TankPawn.h>
+#include "Components/AudioComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 
 // Sets default values
@@ -27,6 +29,11 @@ ACannon::ACannon()
 	ProjectileSpawnPoint = CreateDefaultSubobject<UArrowComponent>(TEXT("Spawn point"));
 	ProjectileSpawnPoint->SetupAttachment(Mesh);
 
+	ShootEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Shoot Effect"));
+	ShootEffect->SetupAttachment(ProjectileSpawnPoint);
+
+	AudioEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Effect"));
+	
 }
 
 void ACannon::SetAmmo()
@@ -42,6 +49,20 @@ void ACannon::Fire()
 		return;
 	}
 	ReadyToFire = false;
+
+	ShootEffect->ActivateSystem();
+	AudioEffect->Play();
+
+	if (GetOwner() && GetOwner() ==	GetWorld()->GetFirstPlayerController()->GetPawn())
+	{
+		if (ShootForceEffect)
+		{
+			FForceFeedbackParameters shootForceEffectParams;
+			shootForceEffectParams.bLooping = false;
+			shootForceEffectParams.Tag = "shootForceEffectParams";
+			GetWorld()->GetFirstPlayerController()->ClientPlayForceFeedback(ShootForceEffect, shootForceEffectParams);
+		}
+	}
 
 	if (Type == ECannonType::FireProjectile)
 	{
@@ -67,8 +88,7 @@ void ACannon::Fire()
 
 		if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end,ECollisionChannel::ECC_WorldStatic, traceParams))
 		{
-			DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false,
-				0.5f, 0, 5);
+			DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
 			if (hitResult.Actor.Get())
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Lazer collided with %s. "), *hitResult.Actor.Get()->GetName());

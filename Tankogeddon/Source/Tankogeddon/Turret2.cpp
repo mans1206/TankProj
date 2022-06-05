@@ -9,6 +9,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include <Runtime/Engine/Public/DrawDebugHelpers.h>
 
 // Sets default values
 ATurret2::ATurret2()
@@ -31,6 +32,11 @@ ATurret2::ATurret2()
 	HealthComponent->OnDie.AddUObject(this, &ATurret2::Die);
 	HealthComponent->OnDamaged.AddUObject(this, &ATurret2::DamageTaked);
 
+	DieEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Die Effect"));
+	DieEffect->SetupAttachment(CannonSetupPoint);
+
+	AudioDieEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Effect"));
+	AudioHitEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Hit-Effect"));
 
 	UStaticMesh* turretMeshTemp = LoadObject<UStaticMesh>(this, *TurretMeshPath);
 	if (turretMeshTemp)
@@ -51,8 +57,7 @@ void ATurret2::BeginPlay()
 	SetupCannon();
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 	FTimerHandle _targetingTimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(_targetingTimerHandle, this,
-		&ATurret2::Targeting, TargetingRate, true, TargetingRate);
+	GetWorld()->GetTimerManager().SetTimer(_targetingTimerHandle, this,	&ATurret2::Targeting, TargetingRate, true, TargetingRate);
 }
 
 void ATurret2::SetupCannon()
@@ -78,7 +83,7 @@ void ATurret2::Destroyed()
 }
 void ATurret2::Targeting()
 {
-	if (IsPlayerInRange())
+	if (IsPlayerInRange() && IsPlayerSeen())
 	{
 		RotateToPlayer();
 	}
@@ -102,8 +107,33 @@ bool ATurret2::IsPlayerInRange()
 	return FVector::Distance(PlayerPawn->GetActorLocation(), GetActorLocation()) <= TargetingRange;
 }
 
+bool ATurret2::IsPlayerSeen()
+{
+	FVector playerPos = PlayerPawn->GetActorLocation();
+	FVector eyesPos = CannonSetupPoint->GetComponentLocation();
+	FHitResult hitResult;
+	FCollisionQueryParams traceParams = FCollisionQueryParams(FName(TEXT("FireTrace")), true, this);
+	traceParams.bTraceComplex = true;
+	traceParams.AddIgnoredActor(Cannon);
+	traceParams.bReturnPhysicalMaterial = false;
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos, ECollisionChannel::ECC_WorldStatic, traceParams))
+	{
+		if (hitResult.Actor.Get())
+		{
+			//DrawDebugLine(GetWorld(), eyesPos, hitResult.Location, FColor::Cyan, false, 0.5f, 0, 10);
+			return hitResult.Actor.Get() == PlayerPawn;
+		}
+	}
+	//DrawDebugLine(GetWorld(), eyesPos, playerPos, FColor::Cyan, false, 0.5f, 0, 10);
+	return false;
+}
+
+
 bool ATurret2::CanFire()
 {
+	if (!IsPlayerSeen())
+		return false;
+
 	FVector targetingDir = TurretMesh->GetForwardVector();
 	FVector dirToPlayer = PlayerPawn->GetActorLocation() - GetActorLocation();
 	dirToPlayer.Normalize();
@@ -113,7 +143,7 @@ bool ATurret2::CanFire()
 
 void ATurret2::Fire()
 {
-	if (IsPlayerInRange())
+	if (IsPlayerInRange() && CanFire())
 	{
 		Cannon->Fire();
 	}
@@ -121,12 +151,16 @@ void ATurret2::Fire()
 
 void ATurret2::TakeDamage(FDamageData DamageData)
 {
+	AudioHitEffect->Play();
 	HealthComponent->TakeDamage(DamageData);
 }
 
 void ATurret2::Die()
 {
 	Destroy();
+	UE_LOG(LogTemp, Warning, TEXT("Turret Died"));
+	DieEffect->ActivateSystem();
+	AudioDieEffect->Play();
 }
 
 void ATurret2::DamageTaked(float DamageValue)

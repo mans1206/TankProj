@@ -18,6 +18,7 @@ protected:
 		ATankPawn* TankPawn;
 	UPROPERTY()
 		FVector MousePos;
+
 	void Fire();
 	void FireSpecial();
 	void ChangeCannon();

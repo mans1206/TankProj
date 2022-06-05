@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY(TankLog);*/
 // Sets default values
 ATankPawn::ATankPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -47,20 +47,32 @@ ATankPawn::ATankPawn()
 	HitCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Hit collider"));
 	HitCollider->SetupAttachment(BodyMesh);
 
+	DieEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Shoot Effect"));
+	DieEffect->SetupAttachment(BodyMesh);
+
+	AudioDieEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Die Effect"));
+	AudioHitEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Hit Effect"));
 }
 
 void ATankPawn::TakeDamage(FDamageData DamageData)
 {
+	AudioHitEffect->Play();
 	HealthComponent->TakeDamage(DamageData);
 }
 
 void ATankPawn::Die()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Tank Died"));
+	
+	//DieEffect->ActivateSystem();
 	Destroy();
+	AudioDieEffect->Play();
+	
 }
 
 void ATankPawn::DamageTaked(float DamageValue)
 {
+	
 	UE_LOG(LogTemp, Warning, TEXT("Tank %s taked damage:%f Health:%f"), *GetName(),DamageValue, HealthComponent->GetHealth());
 }
 
@@ -97,8 +109,7 @@ void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
 		CannonClass = cannonClass;
 	}
 	if (Cannon)
-	{
-		
+	{	
 		Cannon->Destroy();
 	}
 	FActorSpawnParameters params;
@@ -175,7 +186,6 @@ void ATankPawn::Tick(float DeltaTime)
 		targetRotation.Pitch = currRotation.Pitch;
 		targetRotation.Roll = currRotation.Roll;
 		TurretMesh->SetWorldRotation(FMath::Lerp(currRotation, targetRotation, TurretRotationInterpolationKey));
-
 	}
 }
 
@@ -186,3 +196,21 @@ void ATankPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+FVector ATankPawn::GetTurretForwardVector()
+{
+	return TurretMesh->GetForwardVector();
+}
+
+void ATankPawn::RotateTurretTo(FVector TargetPosition)
+{
+	FRotator targetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetPosition);
+	FRotator currRotation = TurretMesh->GetComponentRotation();
+	targetRotation.Pitch = currRotation.Pitch;
+	targetRotation.Roll = currRotation.Roll;
+	TurretMesh->SetWorldRotation(FMath::Lerp(currRotation, targetRotation, TurretRotationInterpolationKey));
+}
+
+FVector ATankPawn::GetEyesPosition()
+{
+	return CanonSetupPoint->GetComponentLocation();
+}
