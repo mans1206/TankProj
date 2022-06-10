@@ -29,7 +29,7 @@ protected:
 	int32 CurrentPatrolPointIndex = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Accuracy")
-		float MovementAccuracy = 50.0f;
+		float MovementAccuracy;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Targeting")
 		float TargetingRange = 1000;
@@ -51,4 +51,5 @@ protected:
 	bool CanFire();
 	void Fire();
 
+	void Initialize();
 };

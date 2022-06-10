@@ -19,7 +19,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class ATankPlayerController;
 class ACannon;
-
+class ATargetPoint;
 
 UCLASS()
 class TANKOGEDDON_API ATankPawn : public APawn, public IDamageTaker//, public TestParClass
@@ -52,7 +52,9 @@ public:
 	UFUNCTION()
 		float GetMovementAccuracy() { return MovementAccuracy; };
 	UFUNCTION()
-		TArray <FVector> GetPatrollingPoints() { return PatrollingPoints; };
+		TArray <FVector> GetPatrollingPoints();
+
+	void SetPatrollingPoints(TArray<ATargetPoint*> NewPatrollingPoints);
 
 	UFUNCTION()
 		FVector GetTurretForwardVector();
@@ -124,7 +126,7 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Patrol points", Meta = (MakeEditWidget = true))
-		TArray<FVector> PatrollingPoints;
+		TArray<ATargetPoint*> PatrollingPoints;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Accuracy")
 		float MovementAccuracy = 50;
 

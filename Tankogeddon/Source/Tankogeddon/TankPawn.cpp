@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Engine/TargetPoint.h"
 #include "Components/ArrowComponent.h"
 
 
@@ -64,7 +65,7 @@ void ATankPawn::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Tank Died"));
 	
-	//DieEffect->ActivateSystem();
+	DieEffect->ActivateSystem();
 	Destroy();
 	AudioDieEffect->Play();
 	
@@ -213,4 +214,19 @@ void ATankPawn::RotateTurretTo(FVector TargetPosition)
 FVector ATankPawn::GetEyesPosition()
 {
 	return CanonSetupPoint->GetComponentLocation();
+}
+
+TArray <FVector> ATankPawn::GetPatrollingPoints()
+{
+	TArray<FVector> points;
+	for (ATargetPoint * point : PatrollingPoints)
+	{
+		points.Add(point->GetActorLocation());
+	}
+	return points;
+}
+
+void ATankPawn::SetPatrollingPoints(TArray<ATargetPoint*> NewPatrollingPoints)
+{
+	PatrollingPoints = NewPatrollingPoints;
 }
