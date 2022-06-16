@@ -54,10 +54,26 @@ ATurret2::ATurret2()
 void ATurret2::BeginPlay()
 {
 	Super::BeginPlay();
-	SetupCannon();
+
+	FActorSpawnParameters params;
+	params.Owner = this;
+	Cannon = GetWorld()->SpawnActor<ACannon>(CannonClass, params);
+	Cannon->AttachToComponent(CannonSetupPoint,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawn();
 	FTimerHandle _targetingTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(_targetingTimerHandle, this,	&ATurret2::Targeting, TargetingRate, true, TargetingRate);
+}
+
+void ATurret2::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	UStaticMesh* turretMeshTemp = LoadObject<UStaticMesh>(this, *TurretMeshPath);
+	if (turretMeshTemp)
+		TurretMesh->SetStaticMesh(turretMeshTemp);
+
+	UStaticMesh* bodyMeshTemp = LoadObject<UStaticMesh>(this, *BodyMeshPath);
+	if (bodyMeshTemp)
+		BodyMesh->SetStaticMesh(bodyMeshTemp);
 }
 
 void ATurret2::SetupCannon()

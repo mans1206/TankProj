@@ -58,10 +58,10 @@ void ATankFactory::TakeDamage(FDamageData DamageData)
 }
 void ATankFactory::Die()
 {
-	//if (LinkedMapLoader)
-	//{
-	//	LinkedMapLoader->SetIsActivated(true);
-	//}
+	/*if (LinkedMapLoader)
+	{
+		LinkedMapLoader->SetIsActivated(true);
+	}*/
 
 	Destroy();
 	AudioDieEffect->Play();

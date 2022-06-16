@@ -15,7 +15,11 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	void Start();
+	virtual void Start();
+	virtual void Explode();
+	bool IsExplode();
+	void proverka();
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,19 +32,28 @@ protected:
 		float MoveSpeed = 500;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Movement|Speed")
 		float MoveRate = 0.005f;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Damage")
 		float Damage = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Damage")
+		float PushForce = 100;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explode")
+		float ExplodeRadius = 50;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Explode")
+		bool isExplodeEnabled = false;
+
+
 	FTimerHandle MovementTimerHandle;
 
 
 	UFUNCTION()
-		void OnMeshOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor*
-			OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool
-			bFromSweep, const FHitResult& SweepResult);
+		void OnMeshOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, 
+			int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void Move();
+		virtual void Move();
 
 public:	
 	// Called every frame
