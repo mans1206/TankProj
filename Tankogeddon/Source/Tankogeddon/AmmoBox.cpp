@@ -22,6 +22,8 @@ AAmmoBox::AAmmoBox()
 	Mesh->SetCollisionProfileName(FName("OverlapAll"));
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Mesh->SetGenerateOverlapEvents(true);
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 }
 
 void AAmmoBox::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
@@ -31,22 +33,12 @@ void AAmmoBox::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 	ATankPawn* Tank = Cast <ATankPawn>(OtherActor);
 	if (Tank)
 	{
+		Tank->GetInventoryManager()->Init(Tank->GetInventoryComponent());
+		Tank->GetInventoryManager()->InitChest(InventoryComponent);
 		Tank->SetupCannon(CannonClass);
 		Destroy();
 	}
 }
 
-// Called when the game starts or when spawned
-void AAmmoBox::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
 
-// Called every frame
-void AAmmoBox::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 

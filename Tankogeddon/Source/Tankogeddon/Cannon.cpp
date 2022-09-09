@@ -36,92 +36,105 @@ ACannon::ACannon()
 	
 }
 
-void ACannon::SetAmmo()
+void ACannon::SetAmmo(float NewAmmo)
 {
-	
-	Ammo = 15;
+	Ammo = NewAmmo;
 }
 
 void ACannon::Fire()
 {
+
 	if (!ReadyToFire)
 	{
 		return;
 	}
 	ReadyToFire = false;
 
-	ShootEffect->ActivateSystem();
-	AudioEffect->Play();
 
-	if (GetOwner() && GetOwner() ==	GetWorld()->GetFirstPlayerController()->GetPawn())
-	{
-		if (ShootForceEffect)
+		ShootEffect->ActivateSystem();
+		AudioEffect->Play();
+
+		if (GetOwner() && GetOwner() == GetWorld()->GetFirstPlayerController()->GetPawn())
 		{
-			FForceFeedbackParameters shootForceEffectParams;
-			shootForceEffectParams.bLooping = false;
-			shootForceEffectParams.Tag = "shootForceEffectParams";
-			GetWorld()->GetFirstPlayerController()->ClientPlayForceFeedback(ShootForceEffect, shootForceEffectParams);
-		}
-	}
-
-	if (Type == ECannonType::FireProjectile)
-	{
-		GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, FString::Printf(TEXT("Fire - projectile, Ammo: %f"), Ammo));
-
-		AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass,ProjectileSpawnPoint->GetComponentLocation(),
-			ProjectileSpawnPoint->GetComponentRotation());
-		if (projectile)
-		{
-			projectile->Start();
-		}
-	}
-	else
-	{
-		GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
-		FHitResult hitResult;
-		FCollisionQueryParams traceParams =	FCollisionQueryParams(FName(TEXT("FireTrace")), true, this);
-		traceParams.bTraceComplex = true;
-		traceParams.bReturnPhysicalMaterial = false;
-
-		FVector start = ProjectileSpawnPoint->GetComponentLocation();
-		FVector end = ProjectileSpawnPoint->GetForwardVector() * FireRange + start;
-
-		if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end,ECollisionChannel::ECC_WorldStatic, traceParams))
-		{
-			DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
-			if (hitResult.Actor.Get())
+			if (ShootForceEffect)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Lazer collided with %s. "), *hitResult.Actor.Get()->GetName());
-				AActor* owner = GetOwner();
-				AActor* ownerByOwner = owner != nullptr ? owner->GetOwner() : nullptr;
-				if (hitResult.Actor.Get() != owner && hitResult.Actor.Get() != ownerByOwner)
-				{
-					IDamageTaker* damageTakerActor = Cast<IDamageTaker>(hitResult.Actor.Get());
-					if (damageTakerActor)
-					{
-						FDamageData damageData;
-						damageData.DamageValue = 1;
-						damageData.Instigator = owner;
-						damageData.DamageMaker = this;
+				FForceFeedbackParameters shootForceEffectParams;
+				shootForceEffectParams.bLooping = false;
+				shootForceEffectParams.Tag = "shootForceEffectParams";
+				GetWorld()->GetFirstPlayerController()->ClientPlayForceFeedback(ShootForceEffect, shootForceEffectParams);
+			}
+		}
 
-						damageTakerActor->TakeDamage(damageData);
-					}
-					else
-					{
-						hitResult.Actor.Get()->Destroy();
-					}
-				}
-				
+		if (Type == ECannonType::FireProjectile)
+		{
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, FString::Printf(TEXT("Fire - projectile, Ammo: %f"), Ammo));
+
+			AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(),
+				ProjectileSpawnPoint->GetComponentRotation());
+			if (projectile)
+			{
+				projectile->Start();
 			}
 		}
 		else
 		{
-			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.5f, 0, 5);
-		}
+			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
+			FHitResult hitResult;
+			FCollisionQueryParams traceParams = FCollisionQueryParams(FName(TEXT("FireTrace")), true, this);
+			traceParams.bTraceComplex = true;
+			traceParams.bReturnPhysicalMaterial = false;
+
+			FVector start = ProjectileSpawnPoint->GetComponentLocation();
+			FVector end = ProjectileSpawnPoint->GetForwardVector() * FireRange + start;
+
+			if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_WorldStatic, traceParams))
+			{
+				DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
+				if (hitResult.Actor.Get())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Lazer collided with %s. "), *hitResult.Actor.Get()->GetName());
+					AActor* owner = GetOwner();
+					AActor* ownerByOwner = owner != nullptr ? owner->GetOwner() : nullptr;
+					if (hitResult.Actor.Get() != owner && hitResult.Actor.Get() != ownerByOwner)
+					{
+						IDamageTaker* damageTakerActor = Cast<IDamageTaker>(hitResult.Actor.Get());
+						if (damageTakerActor)
+						{
+							FDamageData damageData;
+							damageData.DamageValue = 1;
+							damageData.Instigator = owner;
+							damageData.DamageMaker = this;
+
+							damageTakerActor->TakeDamage(damageData);
+						}
+						else
+						{
+							hitResult.Actor.Get()->Destroy();
+						}
+					}
+
+				}
+			}
+			else
+			{
+				DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.5f, 0, 5);
+			}
 	}
+
 	
+	Ammo--;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
 }
+void ACannon::Fireproj()
+{
+	AProjectile* projectile1 = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(),
+		ProjectileSpawnPoint->GetComponentRotation());
+	if (projectile1)
+	{
+		projectile1->Start();
+	}
+}
+
 
 void ACannon::FireSpecial()
 {
@@ -132,22 +145,68 @@ void ACannon::FireSpecial()
 			return;
 		}
 		ReadyToFire = false;
+
 		FireDamage += 2;
+		Reload();
 
 		if (Type == ECannonType::FireProjectile)
 		{
 			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, FString::Printf(TEXT("Fire - projectile, Ammo: %f"), Ammo));
-			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, FString::Printf(TEXT("Fire - projectile, Ammo: %f"), Ammo));
-			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, FString::Printf(TEXT("Fire - projectile, Ammo: %f"), Ammo));
+
+			AProjectile* projectile = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, ProjectileSpawnPoint->GetComponentLocation(),
+				ProjectileSpawnPoint->GetComponentRotation());
+			if (projectile)
+			{
+				projectile->Start();
+			}
 		}
 		else
 		{
 			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
-			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
-			GEngine->AddOnScreenDebugMessage(10, 1, FColor::Green, "Fire - trace");
+			FHitResult hitResult;
+			FCollisionQueryParams traceParams = FCollisionQueryParams(FName(TEXT("FireTrace")), true, this);
+			traceParams.bTraceComplex = true;
+			traceParams.bReturnPhysicalMaterial = false;
+
+			FVector start = ProjectileSpawnPoint->GetComponentLocation();
+			FVector end = ProjectileSpawnPoint->GetForwardVector() * FireRange + start;
+
+			if (GetWorld()->LineTraceSingleByChannel(hitResult, start, end, ECollisionChannel::ECC_WorldStatic, traceParams))
+			{
+				DrawDebugLine(GetWorld(), start, hitResult.Location, FColor::Red, false, 0.5f, 0, 5);
+				if (hitResult.Actor.Get())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Lazer collided with %s. "), *hitResult.Actor.Get()->GetName());
+					AActor* owner = GetOwner();
+					AActor* ownerByOwner = owner != nullptr ? owner->GetOwner() : nullptr;
+					if (hitResult.Actor.Get() != owner && hitResult.Actor.Get() != ownerByOwner)
+					{
+						IDamageTaker* damageTakerActor = Cast<IDamageTaker>(hitResult.Actor.Get());
+						if (damageTakerActor)
+						{
+							FDamageData damageData;
+							damageData.DamageValue = 1;
+							damageData.Instigator = owner;
+							damageData.DamageMaker = this;
+
+							damageTakerActor->TakeDamage(damageData);
+						}
+						else
+						{
+							hitResult.Actor.Get()->Destroy();
+						}
+					}
+
+				}
+			}
+			else
+			{
+				DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.5f, 0, 5);
+			}
 		}
 	}
 	Ammo -= 3;
+	FireRate = 3;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimerHandle, this, &ACannon::Reload, 1 / FireRate, false);
 }
 
@@ -166,18 +225,10 @@ void ACannon::Reload()
 	{
 		ReadyToFire = false;
 	}
-	
 }
 
-// Called when the game starts or when spawned
 void ACannon::BeginPlay()
 {
 	Super::BeginPlay();
 	Reload();
-}
-
-
-void ACannon::Tick(float Value) 
-{
-
 }

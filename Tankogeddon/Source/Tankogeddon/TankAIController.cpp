@@ -42,7 +42,7 @@ void ATankAIController::Tick(float DeltaTime)
 	if (!TankPawn)
 		return;
 
-	TankPawn->MoveForward(1);
+	//TankPawn->MoveForward(1);
 
 	FVector currentPoint = PatrollingPoints[CurrentPatrolPointIndex];
 	FVector pawnLocation = TankPawn->GetActorLocation();
@@ -135,7 +135,7 @@ bool ATankAIController::IsPlayerSeen()
 	traceParams.bTraceComplex = true;
 	traceParams.AddIgnoredActor(TankPawn);
 	traceParams.bReturnPhysicalMaterial = false;
-	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos,	ECollisionChannel::ECC_WorldStatic, traceParams))
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos,	ECollisionChannel::ECC_Visibility, traceParams))
 	{
 		if (hitResult.Actor.Get())
 		{

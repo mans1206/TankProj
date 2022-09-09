@@ -1,0 +1,9 @@
+,Row Name,Id,Name,Type,Rare,Icon,Mesh,Damage,Armor,Intelligence
+1,Currency_Silver,Currency_Silver,Silver,It Currency,Ir Common,/Game/Widgets/Inventory/Invent2_Icons/silver_coin.silver_coin,None,0,0,0
+2,Armor_Steel_Helmet,Armor_Steel_Helmet,Steel Helmet,It Equip,Ir Common,/Game/Widgets/Inventory/Invent2_Icons/steel_helmet.steel_helmet,None,0,0,0
+3,Armor_Leather_Boots,Armor_Leather_Boots,Leather Boots,It Equip,Ir Common,/Game/Widgets/Inventory/Invent2_Icons/boots.boots,None,0,0,0
+4,Weapon_Golden_Sword,Weapon_Golden_Sword,Golden Sword,It Equip,Ir Epic,/Game/Widgets/Inventory/Invent2_Icons/golden_sword.golden_sword,None,0,0,0
+5,Weapon_Bow,Weapon_Bow,Bow,It Equip,Ir Rare,/Game/Widgets/Inventory/Invent2_Icons/bow.bow,None,0,0,0
+6,Weapon_Big_Sword,Weapon_Big_Sword,Big Sword,It Equip,Ir Rare,/Game/Widgets/Inventory/Invent2_Icons/big_sword.big_sword,None,0,0,0
+7,Equip_Golden_Ring,Equip_Golden_Ring,Golden Ring,It Equip,Ir Epic,/Game/Widgets/Inventory/Invent2_Icons/golden_ring.golden_ring,None,0,0,0
+8,Weapon_Wooden_Staff,Weapon_Wooden_Staff,Wooden Staff,It Equip,Ir Common,/Game/Widgets/Inventory/Invent2_Icons/wooden_staff.wooden_staff,None,0,0,0

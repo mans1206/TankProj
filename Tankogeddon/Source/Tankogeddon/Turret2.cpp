@@ -38,6 +38,9 @@ ATurret2::ATurret2()
 	AudioDieEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Effect"));
 	AudioHitEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Hit-Effect"));
 
+	WidgComp = CreateDefaultSubobject<UWidgetComponent>("BarHP");
+	WidgComp->SetupAttachment(BodyMesh);
+
 	UStaticMesh* turretMeshTemp = LoadObject<UStaticMesh>(this, *TurretMeshPath);
 	if (turretMeshTemp)
 		TurretMesh->SetStaticMesh(turretMeshTemp);
@@ -54,6 +57,9 @@ ATurret2::ATurret2()
 void ATurret2::BeginPlay()
 {
 	Super::BeginPlay();
+
+	auto WidClass = WidgComp->GetWidget();
+	HealthBar = Cast<UHP_Bar_Comp>(WidClass);
 
 	FActorSpawnParameters params;
 	params.Owner = this;
@@ -132,7 +138,7 @@ bool ATurret2::IsPlayerSeen()
 	traceParams.bTraceComplex = true;
 	traceParams.AddIgnoredActor(Cannon);
 	traceParams.bReturnPhysicalMaterial = false;
-	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos, ECollisionChannel::ECC_WorldStatic, traceParams))
+	if (GetWorld()->LineTraceSingleByChannel(hitResult, eyesPos, playerPos, ECollisionChannel::ECC_Visibility, traceParams))
 	{
 		if (hitResult.Actor.Get())
 		{
@@ -169,6 +175,15 @@ void ATurret2::TakeDamage(FDamageData DamageData)
 {
 	AudioHitEffect->Play();
 	HealthComponent->TakeDamage(DamageData);
+
+	if (HealthBar)
+	{
+		HealthBar->SetBar(HealthComponent->GetHealth() / 10);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO Health Bar"));
+	}
 }
 
 void ATurret2::Die()

@@ -42,10 +42,10 @@ void ATankFactory::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*if (LinkedMapLoader)
+	if (LinkedMapLoader)
 	{
 		LinkedMapLoader->SetIsActivated(false);
-	}*/
+	}
 
 	FTimerHandle targetingTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(targetingTimerHandle, this, &ATankFactory::SpawnNewTank, SpawnTankRate, true, SpawnTankRate);
@@ -58,10 +58,10 @@ void ATankFactory::TakeDamage(FDamageData DamageData)
 }
 void ATankFactory::Die()
 {
-	/*if (LinkedMapLoader)
+	if (LinkedMapLoader)
 	{
 		LinkedMapLoader->SetIsActivated(true);
-	}*/
+	}
 
 	Destroy();
 	AudioDieEffect->Play();

@@ -9,6 +9,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/TargetPoint.h"
 #include "Components/ArrowComponent.h"
+#include "HP_Bar_Comp.h"
+#include "Components/WidgetComponent.h"
 
 
 /*DECLARE_LOG_CATEGORY_EXTERN(TankLog, All, All);
@@ -52,28 +54,68 @@ ATankPawn::ATankPawn()
 	DieEffect->SetupAttachment(BodyMesh);
 
 	AudioDieEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Die Effect"));
+	AudioDieEffect->SetAutoActivate(false);
 	AudioHitEffect = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Hit Effect"));
+	AudioHitEffect->SetAutoActivate(false);
+
+	WidgComp = CreateDefaultSubobject<UWidgetComponent>("BarHP");
+	WidgComp->SetupAttachment(BodyMesh);
+
+	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>("Inventory");
+	InventoryManagerComponent = CreateDefaultSubobject<UInventoryManagerComponent>("Inventory Manager");
+	EquipmentInventoryComponent = CreateDefaultSubobject<UEquipInventoryComponent>("EquipInventory");
+
+
+	BodySlot = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Tank slot"));
+	BodySlot->SetupAttachment(BodyMesh);
+
+	CanonSlot = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Canon slot"));
+	CanonSlot->SetupAttachment(TurretMesh);
+
+	TurretSlot = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Turret slot"));
+	TurretSlot->SetupAttachment(TurretMesh);
 }
 
 void ATankPawn::TakeDamage(FDamageData DamageData)
 {
+	AudioHitEffect->SetAutoActivate(false);
 	AudioHitEffect->Play();
+
 	HealthComponent->TakeDamage(DamageData);
+
+	if (HealthBar)
+	{
+		HealthBar->SetBar(HealthComponent->GetHealth()/10);
+	}
 }
+
+void ATankPawn::BeginPlay()
+{
+	Super::BeginPlay();
+	TankController = Cast<ATankPlayerController>(GetController());
+	SetupCannon(CannonClass);
+	auto WidClass = WidgComp->GetWidget();
+	HealthBar = Cast<UHP_Bar_Comp>(WidClass);
+	//InventoryManagerComponent->Init(InventoryComponent);
+	//InventoryManagerComponent->InitEquipment(EquipmentInventoryComponent);
+}
+
+
+
 
 void ATankPawn::Die()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Tank Died"));
 	
+	AudioDieEffect->SetAutoActivate(false);
 	DieEffect->ActivateSystem();
 	Destroy();
 	AudioDieEffect->Play();
-	
+	Cannon->Destroy();
 }
 
 void ATankPawn::DamageTaked(float DamageValue)
 {
-	
 	UE_LOG(LogTemp, Warning, TEXT("Tank %s taked damage:%f Health:%f"), *GetName(),DamageValue, HealthComponent->GetHealth());
 }
 
@@ -92,14 +134,6 @@ void ATankPawn::RotateRight(float AxisValue)
 	TargetRightAxisValue = AxisValue;
 }
 
-// Called when the game starts or when spawned
-void ATankPawn::BeginPlay()
-{
-	Super::BeginPlay();
-	TankController = Cast<ATankPlayerController>(GetController());
-
-	SetupCannon(CannonClass);
-}
 
 TSubclassOf<ACannon> OldcanClass;
 void ATankPawn::SetupCannon(TSubclassOf<ACannon> cannonClass)
@@ -137,13 +171,6 @@ void ATankPawn::Fire()
 	}
 }
 
-void ATankPawn::SetAmmo()
-{
-	if (Cannon)
-	{
-		Cannon->SetAmmo();
-	}
-}
 
 void ATankPawn::FireSpecial()
 {
@@ -153,6 +180,47 @@ void ATankPawn::FireSpecial()
 	}
 }
 
+
+void ATankPawn::EquipItem(EEquipSlot Slot, FName ItemId)
+{
+	if (UStaticMeshComponent* Comp = GetEquipComponent(Slot))
+	{
+		auto* Info = InventoryManagerComponent->GetItemData(ItemId);
+		Comp->SetStaticMesh(Info->Mesh.LoadSynchronous());
+		Comp->SetHiddenInGame(false);
+
+		//Damage += Info->Damage;
+	}
+}
+
+void ATankPawn::UnequipItem(EEquipSlot Slot, FName ItemId)
+{
+	if (UStaticMeshComponent* Comp = GetEquipComponent(Slot))
+	{
+		auto* Info = InventoryManagerComponent->GetItemData(ItemId);
+		Comp->SetStaticMesh(nullptr);
+		Comp->SetHiddenInGame(true);
+
+		//Damage -= Info->Damage;
+	}
+}
+
+UStaticMeshComponent* ATankPawn::GetEquipComponent(EEquipSlot EquipSlot)
+{
+	FName Tag;
+	
+	switch (EquipSlot)
+	{
+	case EEquipSlot::Es_Body: Tag = "Body"; break;
+	case EEquipSlot::Es_Turret: Tag = "Turret"; break;
+	case EEquipSlot::Es_Cannon: Tag = "Cannon"; break;
+	default: return nullptr;
+	}
+
+	TArray<UActorComponent*> Found = GetComponentsByTag(UStaticMeshComponent::StaticClass(), Tag);
+
+	return Found.Num() > 0 ? Cast<UStaticMeshComponent>(Found[0]) : nullptr;
+}
 
 // Called every frame
 void ATankPawn::Tick(float DeltaTime)

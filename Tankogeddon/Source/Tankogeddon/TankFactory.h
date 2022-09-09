@@ -10,6 +10,7 @@
 #include "Components/AudioComponent.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "MapLoader.h"
 #include "TankFactory.generated.h"
 
 
@@ -28,7 +29,7 @@ public:
 		virtual void TakeDamage(FDamageData DamageData) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn tanks params")
-		AMapLoader *LinkedMapLoader;
+		AMapLoader* LinkedMapLoader;
 
 protected:
 	// Called when the game starts or when spawned

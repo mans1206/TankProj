@@ -12,7 +12,14 @@
 #include "Components/AudioComponent.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "Particles/ParticleSystemComponent.h"
+#include <Components/WidgetComponent.h>
+#include <Tankogeddon/HP_Bar_Comp.h>
+#include "InventoryComponent.h" 
+#include <Tankogeddon/InventoryManagerComponent.h>
+#include "EquipInventoryComponent.h"
 #include "TankPawn.generated.h"
+
+
 
 class UStaticMeshComponent;
 class USpringArmComponent;
@@ -20,9 +27,10 @@ class UCameraComponent;
 class ATankPlayerController;
 class ACannon;
 class ATargetPoint;
+class UHP_Bar_Comp;
 
 UCLASS()
-class TANKOGEDDON_API ATankPawn : public APawn, public IDamageTaker//, public TestParClass
+class TANKOGEDDON_API ATankPawn : public APawn, public IDamageTaker, public IEquipInterface
 {
 	GENERATED_BODY()
 
@@ -47,7 +55,6 @@ public:
 		void TakeDamage(FDamageData DamageData);
 
 	void SetupCannon(TSubclassOf<ACannon> cannonClass);
-	void SetAmmo();
 
 	UFUNCTION()
 		float GetMovementAccuracy() { return MovementAccuracy; };
@@ -63,7 +70,11 @@ public:
 		void RotateTurretTo(FVector TargetPosition);
 
 	FVector GetEyesPosition();
-
+	ACannon* GetCannon() { return Cannon; };
+	UHealthComponent* GetHealthComponent() { return HealthComponent; };
+	UInventoryManagerComponent* GetInventoryManager() { return InventoryManagerComponent; };
+	UInventoryComponent* GetInventoryComponent() { return InventoryComponent; };
+	UEquipInventoryComponent* GetEquipInventoryComponent() { return EquipmentInventoryComponent; };
 
 protected:
 	// Called when the game starts or when spawned
@@ -90,6 +101,8 @@ protected:
 		float InterpolationKey = 0.1f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret | Speed")
 		float TurretRotationInterpolationKey = 0.5f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret | Cannon")
+		TSubclassOf<ACannon> CannonClass;
 
 	float TargetForwardAxisValue;
 	float TargetLeftAxisValue;
@@ -101,14 +114,22 @@ protected:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UArrowComponent* CanonSetupPoint;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Turret|Cannon")
-		TSubclassOf<ACannon> CannonClass;
+	
 	UPROPERTY()
 		ACannon* Cannon;
 
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UHealthComponent* HealthComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UWidgetComponent* WidgComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UHP_Bar_Comp* HealthBar;
+		
+
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UBoxComponent* HitCollider;
 
@@ -130,6 +151,31 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI | Move params | Accuracy")
 		float MovementAccuracy = 50;
 
+
+	UPROPERTY(EditDefaultsOnly)
+		UInventoryComponent* InventoryComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+		UInventoryManagerComponent* InventoryManagerComponent;
+
+	UPROPERTY(EditDefaultsOnly)
+		UEquipInventoryComponent* EquipmentInventoryComponent;
+	
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Inventory Slots")
+		UStaticMeshComponent* BodySlot;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Inventory Slots")
+		UStaticMeshComponent* TurretSlot;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Inventory Slots")
+		UStaticMeshComponent* CanonSlot;
+
+	virtual void EquipItem(EEquipSlot Slot, FName ItemId) override;
+
+	virtual void UnequipItem(EEquipSlot Slot, FName ItedId) override;
+
+	UStaticMeshComponent* GetEquipComponent(EEquipSlot EquipSlot);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -137,4 +183,5 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	
 };

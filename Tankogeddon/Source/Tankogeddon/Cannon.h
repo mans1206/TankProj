@@ -45,6 +45,7 @@ protected:
 
 	FTimerHandle ReloadTimerHandle;
 
+
 	bool ReadyToFire = false;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
@@ -66,17 +67,15 @@ public:
 
 	void FireSpecial();
 
-	void SetAmmo();
+	void SetAmmo(float NewAmmo);
 
-//	void ChangeCannon();
+	void Fireproj();
+
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	void Reload();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	void Reload();
+	void BeginPlay();
+
 
 };

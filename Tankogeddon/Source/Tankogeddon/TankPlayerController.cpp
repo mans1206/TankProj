@@ -9,6 +9,7 @@
 ATankPlayerController::ATankPlayerController()
 {
 	bShowMouseCursor = true;
+	//PrimaryActorTick.bCanEverTick = true;
 }
 
 void ATankPlayerController::SetupInputComponent()
@@ -20,7 +21,22 @@ void ATankPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Fire", IE_Pressed, this, &ATankPlayerController::Fire);
 	InputComponent->BindAction("FireSpecial", IE_Pressed, this, &ATankPlayerController::FireSpecial);
 	InputComponent->BindAction("ChangeCannon", IE_Pressed, this, &ATankPlayerController::ChangeCannon);
+	InputComponent->BindKey(EKeys::LeftMouseButton, IE_Released, this, &ATankPlayerController::OnLeftMouseButtonUp);
+	InputComponent->BindAction("Open_Inventory", IE_Pressed, this, &ATankPlayerController::OpenInventory);
+	InputComponent->BindAction("OpenEquipInventory", IE_Pressed, this, &ATankPlayerController::OpenEquipInventory);
 }
+
+void ATankPlayerController::OpenInventory()
+{
+	TankPawn->GetInventoryManager()->Init(TankPawn->GetInventoryComponent());
+}
+
+void ATankPlayerController::OpenEquipInventory()
+{
+	TankPawn->GetInventoryManager()->InitEquipment(TankPawn->GetEquipInventoryComponent());
+}
+
+
 void ATankPlayerController::ChangeCannon()
 {
 	TankPawn->ChangeCannon();
@@ -35,8 +51,14 @@ void ATankPlayerController::FireSpecial()
 	TankPawn->FireSpecial();
 }
 
+void ATankPlayerController::OnLeftMouseButtonUp()
+{
+	OnMouseButtonUp.Broadcast();
+}
+
 void ATankPlayerController::BeginPlay()
 {
+	bEnableClickEvents = true;
 	Super::BeginPlay();
 	TankPawn = Cast<ATankPawn>(GetPawn());
 }
@@ -66,5 +88,5 @@ void ATankPlayerController::Tick(float DeltaTime)
 	FVector dir = MousePos - pawnPos;
 	dir.Normalize();
 	MousePos = pawnPos + dir * 1000;
-	DrawDebugLine(GetWorld(), pawnPos, MousePos, FColor::Green, false, 0.1f, 0, 5);
+	//DrawDebugLine(GetWorld(), pawnPos, MousePos, FColor::Green, false, 0.1f, 0, 5);
 }

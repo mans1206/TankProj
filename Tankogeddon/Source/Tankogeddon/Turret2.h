@@ -12,6 +12,8 @@
 #include "Components/AudioComponent.h"
 #include "GameFramework/ForceFeedbackEffect.h"
 #include "Particles/ParticleSystemComponent.h"
+#include <Components/WidgetComponent.h>
+#include <Tankogeddon/HP_Bar_Comp.h>
 #include "Turret2.generated.h"
 
 UCLASS()
@@ -70,6 +72,14 @@ protected:
 		UAudioComponent* AudioDieEffect;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 		UAudioComponent* AudioHitEffect;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UWidgetComponent* WidgComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+		UHP_Bar_Comp* HealthBar;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ammo")
 		TSubclassOf<ACannon> CannonClass;

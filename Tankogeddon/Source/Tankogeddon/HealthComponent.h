@@ -21,9 +21,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health values")
 		float MaxHealth = 10;
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Health values")
 		float CurrentHealth;
+
 public:	
+
+	UFUNCTION(BlueprintCallable)
+		float GetHealthPercent() const;
+
 	// Sets default values for this component's properties
 	UHealthComponent();
 	FOnDie OnDie;

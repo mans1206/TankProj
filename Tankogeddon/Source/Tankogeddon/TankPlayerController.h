@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GameFramework/Actor.h"
 #include "TankPlayerController.generated.h"
 
 
@@ -22,14 +23,21 @@ protected:
 	void Fire();
 	void FireSpecial();
 	void ChangeCannon();
+	void OpenInventory();
+	void OpenEquipInventory();
 
 public:
 	ATankPlayerController();
 	virtual void SetupInputComponent() override;
-	virtual void Tick(float DeltaTine) override;
+	virtual void Tick(float DeltaTime) override;
 	FVector GetmousePos() { return MousePos; };
+
+	//UI
+	FSimpleMulticastDelegate OnMouseButtonUp;
+
 protected:
 
+	void OnLeftMouseButtonUp();
 	virtual void BeginPlay() override;
 	void MoveForward(float AxisValue);
 	void MoveLeft(float AxisValue);
